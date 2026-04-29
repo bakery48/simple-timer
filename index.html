@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>カウントダウンタイマー</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: #0a0a0f;
@@ -27,7 +23,7 @@
     }
 
     #timer-display {
-      font-size: min(28vw, 42vh);
+      font-size: min(26vw, 40vh);
       font-weight: 900;
       letter-spacing: -0.02em;
       line-height: 1;
@@ -36,88 +32,100 @@
       text-shadow: 0 0 60px currentColor;
     }
 
-    body.running #timer-display  { color: #00e5ff; }
-    body.paused  #timer-display  { color: #ffaa00; }
-    body.done    #timer-display  { color: #ff3355; animation: blink 0.5s step-end infinite; }
-    body.setup   #timer-display  { color: #aaaaaa; }
+    body.running #timer-display { color: #00e5ff; }
+    body.done    #timer-display { color: #ff3355; animation: blink 0.5s step-end infinite; }
+    body.setup   #timer-display { color: #444; }
 
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
+    @keyframes blink { 50% { opacity: 0; } }
 
     #label {
-      font-size: min(3vw, 4vh);
+      font-size: min(2.8vw, 4vh);
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      margin-bottom: min(2vw, 3vh);
-      color: #666;
+      margin-bottom: min(2vw, 2.5vh);
       height: 1.5em;
+      color: #555;
     }
 
-    #controls {
+    body.running #label { color: #00a0b5; }
+    body.done    #label { color: #ff3355; }
+
+    /* target time display under countdown */
+    #target-label {
+      font-size: min(2vw, 3vh);
+      color: #444;
+      letter-spacing: 0.2em;
+      margin-top: min(1.5vw, 2vh);
+      height: 1.4em;
+    }
+
+    body.running #target-label { color: #336677; }
+
+    /* Setup */
+    #setup {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: min(2vw, 3vh);
+      margin-top: min(3vw, 4vh);
+    }
+    #setup.visible { display: flex; }
+
+    #setup label {
+      font-size: min(2vw, 3vh);
+      color: #666;
+      letter-spacing: 0.15em;
+    }
+
+    #time-input {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #333;
+      color: #fff;
+      font-family: inherit;
+      font-size: min(7vw, 11vh);
+      font-weight: 700;
+      width: 5em;
+      text-align: center;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      letter-spacing: 0.05em;
+    }
+    #time-input:focus { border-bottom-color: #00e5ff; }
+    #time-input::placeholder { color: #333; }
+
+    #time-hint {
+      font-size: min(1.5vw, 2.2vh);
+      color: #444;
+      letter-spacing: 0.15em;
+    }
+
+    /* Buttons */
+    .btn-row {
       display: flex;
       gap: min(4vw, 5vh);
-      margin-top: min(4vw, 5vh);
-      align-items: center;
+      margin-top: min(2vw, 2.5vh);
     }
 
     button {
       background: transparent;
       border: 2px solid currentColor;
-      color: #888;
+      color: #666;
       font-family: inherit;
-      font-size: min(2.2vw, 3.2vh);
+      font-size: min(2vw, 3vh);
       letter-spacing: 0.2em;
-      padding: 0.6em 1.6em;
+      padding: 0.6em 1.8em;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.15s ease;
       -webkit-tap-highlight-color: transparent;
     }
-
     button:active { opacity: 0.6; transform: scale(0.96); }
     button.primary { color: #00e5ff; border-color: #00e5ff; }
     button.danger  { color: #ff3355; border-color: #ff3355; }
 
-    /* Setup panel */
-    #setup {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: min(2.5vw, 3.5vh);
-      margin-top: min(3vw, 4vh);
-    }
-
-    #setup.visible { display: flex; }
-
-    #setup label {
-      font-size: min(2vw, 3vh);
-      color: #888;
-      letter-spacing: 0.15em;
-    }
-
-    #duration-input {
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid #444;
-      color: #fff;
-      font-family: inherit;
-      font-size: min(5vw, 8vh);
-      font-weight: 700;
-      width: 4em;
-      text-align: center;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    #duration-input:focus { border-bottom-color: #00e5ff; }
-
-    #unit-hint {
-      font-size: min(1.6vw, 2.5vh);
-      color: #555;
-      letter-spacing: 0.2em;
-    }
+    #run-controls { display: none; margin-top: min(3vw, 4vh); }
 
     /* Progress bar */
     #progress-bar {
@@ -125,32 +133,30 @@
       bottom: 0;
       left: 0;
       height: 4px;
-      background: currentColor;
-      color: #00e5ff;
-      transition: width 1s linear, color 0.3s ease;
+      background: #00e5ff;
+      transition: width 1s linear;
       width: 0%;
     }
-
-    body.done #progress-bar { color: #ff3355; width: 0% !important; }
+    body.done #progress-bar { background: #ff3355; width: 0% !important; transition: none; }
   </style>
 </head>
 <body class="setup">
 
-  <div id="label">SET TIMER</div>
-  <div id="timer-display">00</div>
+  <div id="label">TARGET TIME</div>
+  <div id="timer-display">--</div>
+  <div id="target-label"></div>
 
   <div id="setup" class="visible">
-    <label for="duration-input">秒数を入力</label>
-    <input id="duration-input" type="number" min="1" max="99999" value="60" inputmode="numeric">
-    <div id="unit-hint">SECONDS</div>
-    <div id="controls">
+    <label for="time-input">終了時刻を入力</label>
+    <input id="time-input" type="time" value="">
+    <div id="time-hint">HH : MM</div>
+    <div class="btn-row">
       <button class="primary" onclick="startTimer()">START</button>
     </div>
   </div>
 
-  <div id="run-controls" style="display:none">
-    <div id="controls">
-      <button id="pause-btn" class="primary" onclick="togglePause()">PAUSE</button>
+  <div id="run-controls">
+    <div class="btn-row">
       <button class="danger" onclick="resetTimer()">RESET</button>
     </div>
   </div>
@@ -158,111 +164,114 @@
   <div id="progress-bar"></div>
 
 <script>
-  let totalSeconds = 0;
-  let remaining = 0;
   let intervalId = null;
-  let paused = false;
+  let targetTime = null; // Date object
+  let totalSeconds = 0;
 
-  const display   = document.getElementById('timer-display');
-  const label     = document.getElementById('label');
-  const setup     = document.getElementById('setup');
-  const runCtrl   = document.getElementById('run-controls');
-  const pauseBtn  = document.getElementById('pause-btn');
+  const display     = document.getElementById('timer-display');
+  const label       = document.getElementById('label');
+  const targetLabel = document.getElementById('target-label');
+  const setup       = document.getElementById('setup');
+  const runCtrl     = document.getElementById('run-controls');
   const progressBar = document.getElementById('progress-bar');
-  const input     = document.getElementById('duration-input');
+  const input       = document.getElementById('time-input');
+
+  // Default to next round 10-minute mark
+  (function setDefaultTime() {
+    const now = new Date();
+    now.setMinutes(Math.ceil((now.getMinutes() + 1) / 10) * 10, 0, 0);
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    input.value = `${hh}:${mm}`;
+  })();
+
+  function parseTarget(timeStr) {
+    const [hh, mm] = timeStr.split(':').map(Number);
+    const t = new Date();
+    t.setHours(hh, mm, 0, 0);
+    // 過去なら翌日
+    if (t <= new Date()) t.setDate(t.getDate() + 1);
+    return t;
+  }
+
+  function secondsUntil(t) {
+    return Math.max(0, Math.round((t - new Date()) / 1000));
+  }
 
   function updateDisplay(secs) {
     display.textContent = String(secs).padStart(2, '0');
   }
 
-  function updateProgress() {
+  function updateProgress(secs) {
     if (totalSeconds === 0) return;
-    const pct = (remaining / totalSeconds) * 100;
-    progressBar.style.width = pct + '%';
+    progressBar.style.width = ((secs / totalSeconds) * 100) + '%';
   }
 
   function startTimer() {
-    const val = parseInt(input.value, 10);
-    if (!val || val < 1) { input.focus(); return; }
+    if (!input.value) { input.focus(); return; }
 
-    totalSeconds = val;
-    remaining = val;
-    paused = false;
+    targetTime = parseTarget(input.value);
+    const secs = secondsUntil(targetTime);
+
+    if (secs === 0) {
+      timesUp();
+      return;
+    }
+
+    totalSeconds = secs;
+    const hh = String(targetTime.getHours()).padStart(2, '0');
+    const mm = String(targetTime.getMinutes()).padStart(2, '0');
 
     setup.classList.remove('visible');
     runCtrl.style.display = 'block';
     document.body.className = 'running';
     label.textContent = 'REMAINING';
-    updateDisplay(remaining);
-    updateProgress();
+    targetLabel.textContent = `→ ${hh}:${mm}`;
+
+    updateDisplay(secs);
+    updateProgress(secs);
 
     intervalId = setInterval(tick, 1000);
   }
 
   function tick() {
-    remaining--;
-    updateDisplay(remaining);
-    updateProgress();
-
-    if (remaining <= 0) {
-      clearInterval(intervalId);
-      intervalId = null;
-      document.body.className = 'done';
-      label.textContent = 'TIME UP!';
-      progressBar.style.width = '0%';
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 500]);
-    }
+    const secs = secondsUntil(targetTime);
+    updateDisplay(secs);
+    updateProgress(secs);
+    if (secs <= 0) timesUp();
   }
 
-  function togglePause() {
-    if (document.body.classList.contains('done')) return;
-
-    if (paused) {
-      paused = false;
-      document.body.className = 'running';
-      pauseBtn.textContent = 'PAUSE';
-      label.textContent = 'REMAINING';
-      intervalId = setInterval(tick, 1000);
-    } else {
-      paused = true;
-      clearInterval(intervalId);
-      intervalId = null;
-      document.body.className = 'paused';
-      pauseBtn.textContent = 'RESUME';
-      label.textContent = 'PAUSED';
-    }
+  function timesUp() {
+    clearInterval(intervalId);
+    intervalId = null;
+    document.body.className = 'done';
+    label.textContent = 'TIME UP!';
+    targetLabel.textContent = '';
+    updateDisplay(0);
+    if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 500]);
   }
 
   function resetTimer() {
     clearInterval(intervalId);
     intervalId = null;
-    paused = false;
+    targetTime = null;
     totalSeconds = 0;
-    remaining = 0;
     progressBar.style.width = '0%';
 
     document.body.className = 'setup';
-    label.textContent = 'SET TIMER';
+    label.textContent = 'TARGET TIME';
+    targetLabel.textContent = '';
     runCtrl.style.display = 'none';
     setup.classList.add('visible');
-    updateDisplay('00');
+    display.textContent = '--';
     input.focus();
   }
 
-  // Keyboard shortcuts
   document.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      if (document.body.classList.contains('setup')) startTimer();
-    }
-    if (e.key === ' ') {
-      e.preventDefault();
-      if (document.body.classList.contains('running') || document.body.classList.contains('paused')) togglePause();
-    }
+    if (e.key === 'Enter' && document.body.classList.contains('setup')) startTimer();
     if (e.key === 'Escape') resetTimer();
   });
 
-  // Init display
-  updateDisplay('00');
   input.focus();
 </script>
 </body>
