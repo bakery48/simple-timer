@@ -102,6 +102,12 @@
       letter-spacing: 0.15em;
     }
 
+    #input-row {
+      display: flex;
+      align-items: center;
+      gap: min(3vw, 4vh);
+    }
+
     /* Buttons */
     .btn-row {
       display: flex;
@@ -149,11 +155,11 @@
 
   <div id="setup" class="visible">
     <label for="time-input">終了時刻を入力</label>
-    <input id="time-input" type="time" value="">
-    <div id="time-hint">HH : MM</div>
-    <div class="btn-row">
+    <div id="input-row">
+      <input id="time-input" type="time" value="">
       <button class="primary" onclick="startTimer()">START</button>
     </div>
+    <div id="time-hint">HH : MM</div>
   </div>
 
   <div id="run-controls">
