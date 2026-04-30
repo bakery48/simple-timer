@@ -23,13 +23,14 @@
     }
 
     #timer-display {
-      font-size: min(26vw, 40vh);
+      font-size: min(80vw, 68vh); /* overridden by JS per digit count */
       font-weight: 900;
       letter-spacing: -0.02em;
       line-height: 1;
       font-variant-numeric: tabular-nums;
       transition: color 0.3s ease;
-      text-shadow: 0 0 60px currentColor;
+      text-shadow: 0 0 80px currentColor;
+      white-space: nowrap;
     }
 
     body.running #timer-display { color: #00e5ff; }
@@ -198,8 +199,14 @@
     return Math.max(0, Math.round((t - new Date()) / 1000));
   }
 
+  // vw limits per digit count so number fills screen without overflowing width
+  const VW_BY_DIGITS = [80, 80, 55, 42, 33];
+
   function updateDisplay(secs) {
-    display.textContent = String(secs).padStart(2, '0');
+    const str = String(secs).padStart(2, '0');
+    display.textContent = str;
+    const idx = Math.min(str.length, VW_BY_DIGITS.length - 1);
+    display.style.fontSize = `min(${VW_BY_DIGITS[idx]}vw, 68vh)`;
   }
 
   function updateProgress(secs) {
